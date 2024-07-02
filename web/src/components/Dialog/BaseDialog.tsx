@@ -67,7 +67,7 @@ const BaseDialog: React.FC<Props> = (props: Props) => {
 export function generateDialog<T extends DialogProps>(
   config: DialogConfig,
   DialogComponent: React.FC<T>,
-  props?: Omit<T, "destroy" | "hide">,
+  props?: Omit<T, "destroy">,
 ): DialogCallback {
   const tempDiv = document.createElement("div");
   const dialog = createRoot(tempDiv);
@@ -77,25 +77,21 @@ export function generateDialog<T extends DialogProps>(
   const cbs: DialogCallback = {
     destroy: () => {
       document.body.style.removeProperty("overflow");
-      setTimeout(() => {
-        dialog.unmount();
-        tempDiv.remove();
-      });
+      dialog.unmount();
+      tempDiv.remove();
     },
-    hide: () => {},
   };
 
   const dialogProps = {
     ...props,
     destroy: cbs.destroy,
-    hide: cbs.hide,
   } as T;
 
   const Fragment = (
     <Provider store={store}>
       <CssVarsProvider theme={theme}>
         <CommonContextProvider>
-          <BaseDialog destroy={cbs.destroy} hide={cbs.hide} clickSpaceDestroy={true} {...config}>
+          <BaseDialog destroy={cbs.destroy} clickSpaceDestroy={true} {...config}>
             <DialogComponent {...dialogProps} />
           </BaseDialog>
         </CommonContextProvider>

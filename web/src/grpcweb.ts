@@ -3,18 +3,16 @@ import { ActivityServiceDefinition } from "./types/proto/api/v1/activity_service
 import { AuthServiceDefinition } from "./types/proto/api/v1/auth_service";
 import { IdentityProviderServiceDefinition } from "./types/proto/api/v1/idp_service";
 import { InboxServiceDefinition } from "./types/proto/api/v1/inbox_service";
-import { LinkServiceDefinition } from "./types/proto/api/v1/link_service";
+import { MarkdownServiceDefinition } from "./types/proto/api/v1/markdown_service";
 import { MemoServiceDefinition } from "./types/proto/api/v1/memo_service";
 import { ResourceServiceDefinition } from "./types/proto/api/v1/resource_service";
-import { StorageServiceDefinition } from "./types/proto/api/v1/storage_service";
-import { TagServiceDefinition } from "./types/proto/api/v1/tag_service";
 import { UserServiceDefinition } from "./types/proto/api/v1/user_service";
 import { WebhookServiceDefinition } from "./types/proto/api/v1/webhook_service";
 import { WorkspaceServiceDefinition } from "./types/proto/api/v1/workspace_service";
 import { WorkspaceSettingServiceDefinition } from "./types/proto/api/v1/workspace_setting_service";
 
 const channel = createChannel(
-  import.meta.env.VITE_API_BASE_URL || window.location.origin,
+  window.location.origin,
   FetchTransport({
     credentials: "include",
   }),
@@ -34,16 +32,12 @@ export const memoServiceClient = clientFactory.create(MemoServiceDefinition, cha
 
 export const resourceServiceClient = clientFactory.create(ResourceServiceDefinition, channel);
 
-export const tagServiceClient = clientFactory.create(TagServiceDefinition, channel);
-
 export const inboxServiceClient = clientFactory.create(InboxServiceDefinition, channel);
 
 export const activityServiceClient = clientFactory.create(ActivityServiceDefinition, channel);
 
 export const webhookServiceClient = clientFactory.create(WebhookServiceDefinition, channel);
 
-export const linkServiceClient = clientFactory.create(LinkServiceDefinition, channel);
-
-export const storageServiceClient = clientFactory.create(StorageServiceDefinition, channel);
+export const markdownServiceClient = clientFactory.create(MarkdownServiceDefinition, channel);
 
 export const identityProviderServiceClient = clientFactory.create(IdentityProviderServiceDefinition, channel);

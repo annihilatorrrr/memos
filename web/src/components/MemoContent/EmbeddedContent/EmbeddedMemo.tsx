@@ -44,7 +44,7 @@ const EmbeddedMemo = ({ resourceId, params: paramsStr }: Props) => {
         <MemoContent
           key={`${memo.name}-${memo.updateTime}`}
           memoName={memo.name}
-          content={memo.content}
+          nodes={memo.nodes}
           embeddedMemos={context.embeddedMemos}
         />
         <MemoResourceListView resources={memo.resources} />
@@ -63,9 +63,10 @@ const EmbeddedMemo = ({ resourceId, params: paramsStr }: Props) => {
         </Link>
       </div>
       <MemoContent
+        contentClassName="line-clamp-3"
         key={`${memo.name}-${memo.updateTime}`}
         memoName={memo.name}
-        content={memo.content}
+        nodes={memo.nodes}
         embeddedMemos={context.embeddedMemos}
       />
       <MemoResourceListView resources={memo.resources} />

@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import useLocalStorage from "react-use/lib/useLocalStorage";
 import { workspaceServiceClient } from "@/grpcweb";
-import storage from "@/helpers/storage";
 import { useUserStore, useWorkspaceSettingStore } from "@/store/v1";
 import { WorkspaceProfile } from "@/types/proto/api/v1/workspace_service";
 import { WorkspaceGeneralSetting, WorkspaceSettingKey } from "@/types/proto/store/workspace_setting";
@@ -24,23 +24,28 @@ const CommonContext = createContext<Context>({
 const CommonContextProvider = ({ children }: { children: React.ReactNode }) => {
   const workspaceSettingStore = useWorkspaceSettingStore();
   const userStore = useUserStore();
-  const [loading, setLoading] = useState(true);
+  const [initialized, setInitialized] = useState(false);
   const [commonContext, setCommonContext] = useState<Pick<Context, "locale" | "appearance" | "profile">>({
     locale: "en",
     appearance: "system",
     profile: WorkspaceProfile.fromPartial({}),
   });
+  const [locale] = useLocalStorage("locale", "en");
+  const [appearance] = useLocalStorage("appearance", "system");
 
   useEffect(() => {
     const initialWorkspace = async () => {
       const workspaceProfile = await workspaceServiceClient.getWorkspaceProfile({});
-      await workspaceSettingStore.listWorkspaceSettings();
+      // Initial fetch for workspace settings.
+      (async () => {
+        [WorkspaceSettingKey.GENERAL, WorkspaceSettingKey.MEMO_RELATED].forEach(async (key) => {
+          await workspaceSettingStore.fetchWorkspaceSetting(key);
+        });
+      })();
 
       const workspaceGeneralSetting =
-        workspaceSettingStore.getWorkspaceSettingByKey(WorkspaceSettingKey.WORKSPACE_SETTING_GENERAL).generalSetting ||
+        workspaceSettingStore.getWorkspaceSettingByKey(WorkspaceSettingKey.GENERAL).generalSetting ||
         WorkspaceGeneralSetting.fromPartial({});
-      const { locale } = storage.get(["locale"]);
-      const { appearance } = storage.get(["appearance"]);
       setCommonContext({
         locale: locale || workspaceGeneralSetting.customProfile?.locale || "en",
         appearance: appearance || workspaceGeneralSetting.customProfile?.appearance || "system",
@@ -56,7 +61,7 @@ const CommonContextProvider = ({ children }: { children: React.ReactNode }) => {
       }
     };
 
-    Promise.all([initialWorkspace(), initialUser()]).then(() => setLoading(false));
+    Promise.all([initialWorkspace(), initialUser()]).then(() => setInitialized(true));
   }, []);
 
   return (
@@ -67,7 +72,7 @@ const CommonContextProvider = ({ children }: { children: React.ReactNode }) => {
         setAppearance: (appearance: string) => setCommonContext({ ...commonContext, appearance }),
       }}
     >
-      {loading ? null : <>{children}</>}
+      {!initialized ? null : <>{children}</>}
     </CommonContext.Provider>
   );
 };
