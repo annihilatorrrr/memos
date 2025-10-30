@@ -14,6 +14,7 @@ import { useTranslate } from "@/utils/i18n";
 import Empty from "../Empty";
 import MasonryView, { MemoRenderContext } from "../MasonryView";
 import MemoEditor from "../MemoEditor";
+import MemoFilters from "../MemoFilters";
 import MemoSkeleton from "../MemoSkeleton";
 
 interface Props {
@@ -145,16 +146,20 @@ const PagedMemoList = observer((props: Props) => {
     <div className="flex flex-col justify-start items-start w-full max-w-full">
       {/* Show skeleton loader during initial load */}
       {isRequesting && sortedMemoList.length === 0 ? (
-        <>
-          {showMemoEditor && <MemoEditor className="mb-2" cacheKey="home-memo-editor" />}
-          <MemoSkeleton showCreator={props.showCreator} count={6} />
-        </>
+        <div className="w-full flex flex-col justify-start items-center">
+          <MemoSkeleton showCreator={props.showCreator} count={4} />
+        </div>
       ) : (
         <>
           <MasonryView
             memoList={sortedMemoList}
             renderer={props.renderer}
-            prefixElement={showMemoEditor ? <MemoEditor className="mb-2" cacheKey="home-memo-editor" /> : undefined}
+            prefixElement={
+              <>
+                {showMemoEditor ? <MemoEditor className="mb-2" cacheKey="home-memo-editor" /> : undefined}
+                <MemoFilters />
+              </>
+            }
             listMode={viewStore.state.layout === "LIST"}
           />
 
